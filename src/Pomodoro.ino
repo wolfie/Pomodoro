@@ -82,7 +82,7 @@ void counting() {
     endMillis = millis() + POMODORO_TIME;
   }
 
-  float progress = (endMillis - millis()) / POMODORO_TIME;
+  const float progress = (endMillis - millis()) / POMODORO_TIME;
   if (progress < 0) {
     state = STATE_REST;
     endMillis = 0;
@@ -93,14 +93,14 @@ void counting() {
     return;
   }
 
-  float ledProgress = progress * 11;
+  const float ledProgress = progress * 11;
   for (uint8_t led = 1; led <= floor(ledProgress); led++) {
     b.ledOn(led, 255, 0, 0);
   }
 
-  uint8_t lastLed = (uint8_t) ceil(ledProgress);
-  float lastLedProgress = ledProgress - floor(ledProgress);
-  uint8_t lastLedRedness = (uint8_t)round(lastLedProgress * 255);
+  const uint8_t lastLed = (uint8_t) ceil(ledProgress);
+  const float lastLedProgress = ledProgress - floor(ledProgress);
+  const uint8_t lastLedRedness = (uint8_t)round(lastLedProgress * 255);
   b.ledOn(lastLed, lastLedRedness, 0, 0);
 
   for (uint8_t led = lastLed+1; led <= 11; led++) {
