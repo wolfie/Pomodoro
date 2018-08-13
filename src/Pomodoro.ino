@@ -60,7 +60,7 @@ void loop() {
     case STATE_WAIT: wait(); break;
     case STATE_COUNTING: counting(); break;
     case STATE_REST: rest(); break;
-    default:
+    default: break;
   }
 
   if (!b.buttonOn(3)) wasStartPausePressed = false;
