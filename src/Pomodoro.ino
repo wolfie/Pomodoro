@@ -1,15 +1,17 @@
 #include <InternetButton.h>
 #include <math.h>
 
-/*
-#define POMODORO_TIME 1500000L // 25mins
-#define NORMAL_REST_TIME 300000L // 5mins
-#define LONG_REST_TIME 1800000L // 30mins
-*/
+#define DEVMODE false
 
-#define POMODORO_TIME 15000L
-#define NORMAL_REST_TIME 3000L
-#define LONG_REST_TIME 18000L
+#if DEVMODE
+  #define POMODORO_TIME 15000L
+  #define NORMAL_REST_TIME 3000L
+  #define LONG_REST_TIME 18000L
+#else
+  #define POMODORO_TIME 1500000L // 25mins
+  #define NORMAL_REST_TIME 300000L // 5mins
+  #define LONG_REST_TIME 1800000L // 30mins
+#endif
 
 #define RESET_HOLD_TIME 500L
 
