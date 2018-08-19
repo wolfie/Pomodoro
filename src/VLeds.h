@@ -13,6 +13,8 @@ class VLeds {
     void ledOff(uint8_t led);
     void allLedsOff();
 
+    void copyFrom(const VLeds& other);
+
   private:
     InternetButton b;
     uint8_t vLeds [11][3] = {

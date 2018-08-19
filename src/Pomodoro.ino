@@ -15,6 +15,7 @@
 #endif
 
 #define RESET_HOLD_TIME 500L
+#define BLINK_INTERVAL 5000L
 
 #define STATE_WAIT 0
 #define STATE_COUNTING 1
@@ -23,6 +24,7 @@
 
 InternetButton b = InternetButton();
 VLeds leds = VLeds(b);
+VLeds pauseLeds = VLeds(b);
 
 float endMillis;
 float resetHoldEnd;
@@ -158,10 +160,17 @@ void rest(float now) {
 }
 
 void pause(float now) {
+  if (fmod(now, BLINK_INTERVAL) < BLINK_INTERVAL/2) {
+    leds.copyFrom(pauseLeds);
+  } else {
+    leds.allLedsOff();
+  }
+
   if (wasStartPauseReleased()) {
     b.playNote("C5", 8);
     endMillis += (now - pauseStart);
     state = stateBeforePause;
+    leds.copyFrom(pauseLeds);
   }
 }
 
@@ -179,6 +188,7 @@ bool wasStartPauseReleased() {
 }
 
 void initPause(float now) {
+  pauseLeds.copyFrom(leds);
   stateBeforePause = state;
   state = STATE_PAUSE;
   pauseStart = now;

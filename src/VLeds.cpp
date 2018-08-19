@@ -26,3 +26,11 @@ void VLeds::allLedsOff() {
     ledOn(led, 0,0,0);
   }
 }
+
+void VLeds::copyFrom(const VLeds& other) {
+  for (uint8_t led = 0; led < 11; led++) {
+    vLeds[led][0] = other.vLeds[led][0];
+    vLeds[led][1] = other.vLeds[led][1];
+    vLeds[led][2] = other.vLeds[led][2];
+  }
+}
