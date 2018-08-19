@@ -18,3 +18,5 @@ the [Internet Button](https://store.particle.io/products/internet-button).
 
 You can reset the counts at any time by keeping the Button1 (up) pressed down
 for a while.
+
+You can also pause (and resume) the countdowns by pressing the Button3.
