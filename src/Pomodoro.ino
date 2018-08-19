@@ -28,6 +28,20 @@ bool resetSoundWasPlayed;
 uint8_t state;
 uint8_t iterationsDone;
 
+uint8_t vLeds [11][3] = {
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0}
+};
+
 void setup() {
   b.begin();
 
@@ -49,7 +63,7 @@ void loop() {
       state = STATE_WAIT;
       iterationsDone = 0;
       endMillis = 0;
-      b.allLedsOff();
+      allLedsOff();
       if (!resetSoundWasPlayed) {
         b.playNote("C5", 8);
         resetSoundWasPlayed = true;
@@ -68,6 +82,10 @@ void loop() {
   }
 
   if (!b.buttonOn(3)) wasStartPausePressed = false;
+
+  for (uint8_t led = 0; led < 11; led++) {
+    b.ledOn(led+1, vLeds[led][0], vLeds[led][1], vLeds[led][2]);
+  }
 }
 
 void wait(float now) {
@@ -97,13 +115,13 @@ void counting(float now) {
 
   const float ledProgress = progress * 11;
   for (uint8_t led = 1; led <= floor(ledProgress); led++) {
-    b.ledOn(led, 255, 0, 0);
+    setLed(led, 255, 0, 0);
   }
 
   const uint8_t lastLed = (uint8_t) ceil(ledProgress);
   const float lastLedProgress = ledProgress - floor(ledProgress);
   const uint8_t lastLedRedness = (uint8_t)round(lastLedProgress * 255);
-  b.ledOn(lastLed, lastLedRedness, 0, 0);
+  setLed(lastLed, lastLedRedness, 0, 0);
 
   for (uint8_t led = lastLed+1; led <= 11; led++) {
     b.ledOff(led);
@@ -138,20 +156,32 @@ void rest(float now) {
       led == 1 && iterationsDone >= 3 ||
       led == 2 && iterationsDone >= 4
     ) continue;
-    b.ledOn(led, colorProgress, colorProgress, colorProgress);
+    setLed(led, colorProgress, colorProgress, colorProgress);
   }
   showCheckmarks();
 }
 
 void showCheckmarks() {
   for (uint8_t i = iterationsDone; i > 0; i--) {
-    if (i == 1) b.ledOn(10, 0, 255, 0);
-    if (i == 2) b.ledOn(11, 0, 255, 0);
-    if (i == 3) b.ledOn(1, 0, 255, 0);
-    if (i == 4) b.ledOn(2, 0, 255, 0);
+    if (i == 1) setLed(10, 0, 255, 0);
+    if (i == 2) setLed(11, 0, 255, 0);
+    if (i == 3) setLed(1, 0, 255, 0);
+    if (i == 4) setLed(2, 0, 255, 0);
   }
 }
 
 bool wasStartPauseReleased() {
   return !b.buttonOn(3) && wasStartPausePressed;
+}
+
+void setLed(uint8_t led, uint8_t r, uint8_t g, uint8_t b) {
+  vLeds[led-1][0] = r;
+  vLeds[led-1][1] = g;
+  vLeds[led-1][2] = b;
+}
+
+void allLedsOff() {
+  for (uint8_t led = 1; led <= 11; led++) {
+    setLed(led, 0,0,0);
+  }
 }
