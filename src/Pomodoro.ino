@@ -136,12 +136,6 @@ void rest(float now) {
 
   const float colorProgress = progress * 255;
   for (uint8_t led = 1; led <= 11; led++) {
-    if (
-      led == 10 && iterationsDone >= 1 ||
-      led == 11 && iterationsDone >= 2 ||
-      led == 1 && iterationsDone >= 3 ||
-      led == 2 && iterationsDone >= 4
-    ) continue;
     leds.ledOn(led, colorProgress, colorProgress, colorProgress);
   }
   showCheckmarks();
