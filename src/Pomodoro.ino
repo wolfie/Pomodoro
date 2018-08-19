@@ -19,6 +19,7 @@
 #define STATE_WAIT 0
 #define STATE_COUNTING 1
 #define STATE_REST 2
+#define STATE_PAUSE 3
 
 InternetButton b = InternetButton();
 VLeds leds = VLeds(b);
@@ -30,6 +31,9 @@ bool resetSoundWasPlayed;
 uint8_t state;
 uint8_t iterationsDone;
 
+float pauseStart;
+uint8_t stateBeforePause;
+
 void setup() {
   b.begin();
 
@@ -39,6 +43,9 @@ void setup() {
   endMillis = 0;
   resetHoldEnd = 0;
   resetSoundWasPlayed = false;
+
+  pauseStart = 0;
+  stateBeforePause = 0;
 }
 
 void loop() {
@@ -66,6 +73,7 @@ void loop() {
     case STATE_WAIT: wait(now); break;
     case STATE_COUNTING: counting(now); break;
     case STATE_REST: rest(now); break;
+    case STATE_PAUSE: pause(now); break;
     default: break;
   }
 
@@ -86,6 +94,10 @@ void wait(float now) {
 void counting(float now) {
   if (endMillis < 1) {
     endMillis = now + POMODORO_TIME;
+  }
+
+  if (wasStartPauseReleased()) {
+    initPause(now);
   }
 
   const float progress = (endMillis - now) / POMODORO_TIME;
@@ -118,6 +130,10 @@ void rest(float now) {
   const float restTime = iterationsDone < 4 ? NORMAL_REST_TIME : LONG_REST_TIME;
   if (endMillis < 1) endMillis = now + restTime;
 
+  if (wasStartPauseReleased()) {
+    initPause(now);
+  }
+
   const float progress = (endMillis - now) / restTime;
   if (progress < 0) {
     state = STATE_WAIT;
@@ -141,6 +157,14 @@ void rest(float now) {
   showCheckmarks();
 }
 
+void pause(float now) {
+  if (wasStartPauseReleased()) {
+    b.playNote("C5", 8);
+    endMillis += (now - pauseStart);
+    state = stateBeforePause;
+  }
+}
+
 void showCheckmarks() {
   for (uint8_t i = iterationsDone; i > 0; i--) {
     if (i == 1) leds.ledOn(10, 0, 255, 0);
@@ -152,4 +176,11 @@ void showCheckmarks() {
 
 bool wasStartPauseReleased() {
   return !b.buttonOn(3) && wasStartPausePressed;
+}
+
+void initPause(float now) {
+  stateBeforePause = state;
+  state = STATE_PAUSE;
+  pauseStart = now;
+  b.playNote("C5", 8);
 }
