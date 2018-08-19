@@ -40,10 +40,12 @@ void setup() {
 }
 
 void loop() {
+  float now = millis();
+
   if (b.buttonOn(3)) wasStartPausePressed = true;
   if (b.buttonOn(1)) {
-    if (resetHoldEnd == 0) resetHoldEnd = millis() + RESET_HOLD_TIME;
-    else if (millis() > resetHoldEnd) {
+    if (resetHoldEnd == 0) resetHoldEnd = now + RESET_HOLD_TIME;
+    else if (now > resetHoldEnd) {
       state = STATE_WAIT;
       iterationsDone = 0;
       endMillis = 0;
@@ -59,16 +61,16 @@ void loop() {
   }
 
   switch (state) {
-    case STATE_WAIT: wait(); break;
-    case STATE_COUNTING: counting(); break;
-    case STATE_REST: rest(); break;
+    case STATE_WAIT: wait(now); break;
+    case STATE_COUNTING: counting(now); break;
+    case STATE_REST: rest(now); break;
     default: break;
   }
 
   if (!b.buttonOn(3)) wasStartPausePressed = false;
 }
 
-void wait() {
+void wait(float now) {
   showCheckmarks();
   if (wasStartPauseReleased()) {
     state = STATE_COUNTING;
@@ -77,12 +79,12 @@ void wait() {
   }
 }
 
-void counting() {
+void counting(float now) {
   if (endMillis < 1) {
-    endMillis = millis() + POMODORO_TIME;
+    endMillis = now + POMODORO_TIME;
   }
 
-  const float progress = (endMillis - millis()) / POMODORO_TIME;
+  const float progress = (endMillis - now) / POMODORO_TIME;
   if (progress < 0) {
     state = STATE_REST;
     endMillis = 0;
@@ -108,11 +110,11 @@ void counting() {
   }
 }
 
-void rest() {
+void rest(float now) {
   const float restTime = iterationsDone < 4 ? NORMAL_REST_TIME : LONG_REST_TIME;
-  if (endMillis < 1) endMillis = millis() + restTime;
+  if (endMillis < 1) endMillis = now + restTime;
 
-  const float progress = (endMillis - millis()) / restTime;
+  const float progress = (endMillis - now) / restTime;
   if (progress < 0) {
     state = STATE_WAIT;
     endMillis = 0;
