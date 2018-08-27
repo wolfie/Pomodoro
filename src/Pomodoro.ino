@@ -1,6 +1,6 @@
 #include <InternetButton.h>
 #include <math.h>
-#include "VLeds.h"
+#include "VirtualLeds.h"
 
 #define DEVMODE false
 
@@ -27,8 +27,8 @@
 #define STATE_ONLINE 4
 
 InternetButton b = InternetButton();
-VLeds leds = VLeds(b);
-VLeds pauseLeds = VLeds(b);
+VirtualLeds leds = VirtualLeds(b);
+VirtualLeds pauseLeds = VirtualLeds(b);
 
 float endMillis;
 float resetHoldEnd;

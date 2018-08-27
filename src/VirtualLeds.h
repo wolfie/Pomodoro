@@ -3,9 +3,9 @@
 #ifndef VLEDS_H
 #define VLEDS_H
 
-class VLeds {
+class VirtualLeds {
   public:
-    VLeds(const InternetButton& b);
+    VirtualLeds(const InternetButton& b);
 
     void loop();
 
@@ -15,7 +15,7 @@ class VLeds {
     void allLedsOn(uint8_t r, uint8_t g, uint8_t b);
     void allLedsOff();
 
-    void copyFrom(const VLeds& other);
+    void copyFrom(const VirtualLeds& other);
 
   private:
     InternetButton b;
