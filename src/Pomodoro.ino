@@ -55,17 +55,7 @@ void loop() {
 
   if (b.buttonOn(3)) wasStartPausePressed = true;
   if (b.buttonOn(1)) {
-    if (resetHoldEnd == 0) resetHoldEnd = now + RESET_HOLD_TIME;
-    else if (now > resetHoldEnd) {
-      state = STATE_WAIT;
-      iterationsDone = 0;
-      endMillis = 0;
-      leds.allLedsOff();
-      if (!resetSoundWasPlayed) {
-        b.playNote("C5", 8);
-        resetSoundWasPlayed = true;
-      }
-    }
+    handleHoldToReset(now);
   } else {
     resetHoldEnd = 0;
     resetSoundWasPlayed = false;
@@ -193,4 +183,18 @@ void initPause(float now) {
   state = STATE_PAUSE;
   pauseStart = now;
   b.playNote("C5", 8);
+}
+
+void handleHoldToReset(float now) {
+  if (resetHoldEnd == 0) resetHoldEnd = now + RESET_HOLD_TIME;
+  else if (now > resetHoldEnd) {
+    state = STATE_WAIT;
+    iterationsDone = 0;
+    endMillis = 0;
+    leds.allLedsOff();
+    if (!resetSoundWasPlayed) {
+      b.playNote("C5", 8);
+      resetSoundWasPlayed = true;
+    }
+  }
 }
