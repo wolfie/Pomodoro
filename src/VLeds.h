@@ -11,6 +11,8 @@ class VLeds {
 
     void ledOn(uint8_t led, uint8_t r, uint8_t g, uint8_t b);
     void ledOff(uint8_t led);
+
+    void allLedsOn(uint8_t r, uint8_t g, uint8_t b);
     void allLedsOff();
 
     void copyFrom(const VLeds& other);

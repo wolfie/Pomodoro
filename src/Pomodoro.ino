@@ -14,8 +14,8 @@
   #define LONG_REST_TIME 1800000L // 30mins
 #endif
 
-#define RESET_HOLD_TIME 500L
-#define BLINK_INTERVAL 5000L
+#define RESET_HOLD_TIME 500.0
+#define BLINK_INTERVAL 5000.0
 
 #define CLICKS_FOR_ONLINE 3
 #define MAX_DELAY_BETWEEN_CLICKS_FOR_ONLINE 500.0
@@ -24,6 +24,7 @@
 #define STATE_COUNTING 1
 #define STATE_REST 2
 #define STATE_PAUSE 3
+#define STATE_ONLINE 4
 
 InternetButton b = InternetButton();
 VLeds leds = VLeds(b);
@@ -42,6 +43,8 @@ uint8_t stateBeforePause;
 bool wasResetPressed;
 uint8_t onlineClicks;
 float lastOnlineClickTime;
+
+SYSTEM_MODE(MANUAL);
 
 void setup() {
   b.begin();
@@ -78,6 +81,7 @@ void loop() {
     case STATE_COUNTING: counting(now); break;
     case STATE_REST: rest(now); break;
     case STATE_PAUSE: pause(now); break;
+    case STATE_ONLINE: online(now); break;
     default: break;
   }
 
@@ -182,6 +186,23 @@ void pause(float now) {
   }
 }
 
+void online(float now) {
+  if (Particle.connected() == false) {
+    // We need to write to leds directly, since the connection call is synchronous.
+    b.allLedsOn(128, 0, 128);
+    Particle.connect();
+    waitFor(Particle.connected, 5000);
+  } else {
+    if (fmod(now, BLINK_INTERVAL) < BLINK_INTERVAL/2) {
+      leds.allLedsOn(128, 128, 0);
+    } else {
+      leds.allLedsOn(64, 64, 0);
+    }
+    Particle.process();
+    delay(200);
+  }
+}
+
 void showCheckmarks() {
   for (uint8_t i = iterationsDone; i > 0; i--) {
     if (i == 1) leds.ledOn(10, 0, 255, 0);
@@ -224,8 +245,7 @@ void handleMultipleClicksForOnlineMode(float now) {
   }
 
   if (onlineClicks >= CLICKS_FOR_ONLINE) {
-    // change state
-    b.playNote("C4", 8);
+    state = STATE_ONLINE;
     onlineClicks = 0;
   }
 

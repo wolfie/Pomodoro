@@ -22,8 +22,12 @@ void VLeds::ledOff(uint8_t led) {
 }
 
 void VLeds::allLedsOff() {
+  allLedsOn(0, 0, 0);
+}
+
+void VLeds::allLedsOn(uint8_t r, uint8_t g, uint8_t b) {
   for (uint8_t led = 1; led <= 11; led++) {
-    ledOn(led, 0,0,0);
+    ledOn(led, r, g, b);
   }
 }
 
