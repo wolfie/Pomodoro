@@ -17,6 +17,9 @@
 #define RESET_HOLD_TIME 500L
 #define BLINK_INTERVAL 5000L
 
+#define CLICKS_FOR_ONLINE 3
+#define MAX_DELAY_BETWEEN_CLICKS_FOR_ONLINE 500.0
+
 #define STATE_WAIT 0
 #define STATE_COUNTING 1
 #define STATE_REST 2
@@ -36,6 +39,10 @@ uint8_t iterationsDone;
 float pauseStart;
 uint8_t stateBeforePause;
 
+bool wasResetPressed;
+uint8_t onlineClicks;
+float lastOnlineClickTime;
+
 void setup() {
   b.begin();
 
@@ -48,6 +55,10 @@ void setup() {
 
   pauseStart = 0;
   stateBeforePause = 0;
+
+  wasResetPressed = 0;
+  onlineClicks = 0;
+  lastOnlineClickTime = 0.0;
 }
 
 void loop() {
@@ -55,6 +66,7 @@ void loop() {
 
   if (b.buttonOn(3)) wasStartPausePressed = true;
   if (b.buttonOn(1)) {
+    wasResetPressed = true;
     handleHoldToReset(now);
   } else {
     resetHoldEnd = 0;
@@ -70,6 +82,12 @@ void loop() {
   }
 
   if (!b.buttonOn(3)) wasStartPausePressed = false;
+  if (!b.buttonOn(1)) {
+    if (wasResetPressed) {
+      handleMultipleClicksForOnlineMode(now);
+    }
+    wasResetPressed = false;
+  }
 
   leds.loop();
 }
@@ -197,4 +215,20 @@ void handleHoldToReset(float now) {
       resetSoundWasPlayed = true;
     }
   }
+}
+
+void handleMultipleClicksForOnlineMode(float now) {
+  const float delta = now - lastOnlineClickTime;
+  if (delta > MAX_DELAY_BETWEEN_CLICKS_FOR_ONLINE) {
+    onlineClicks = 1;
+  }
+
+  if (onlineClicks >= CLICKS_FOR_ONLINE) {
+    // change state
+    b.playNote("C4", 8);
+    onlineClicks = 0;
+  }
+
+  onlineClicks++;
+  lastOnlineClickTime = now;
 }
